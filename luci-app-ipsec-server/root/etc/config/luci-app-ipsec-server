@@ -5,8 +5,3 @@ config service 'ipsec'
 	option clientip '192.168.100.10/24'
 	option clientdns '223.5.5.5'
 
-config users
-	option enabled '1'
-	option username 'guest'
-	option password '123456'
-
