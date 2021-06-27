@@ -13,28 +13,27 @@ add_rule() {
 	iptables -N SOFTETHER_VPN-SERVER
 	iptables -I INPUT -j SOFTETHER_VPN-SERVER
 	
-	iptables -A SOFTETHER_VPN-SERVER -p udp -m multiport --dports 500,1701,4500 -m comment --comment "L2TP/IPSec" -j ACCEPT
+	iptables -A SOFTETHER_VPN-SERVER -p udp -m multiport --dports 500,1701,4500 -m comment --comment "L2TP-IPSec" -j ACCEPT
 	iptables -A SOFTETHER_VPN-SERVER -p udp --dport $openvpnport -m comment --comment "OpenVPN" -j ACCEPT
 	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport $openvpnport -m comment --comment "OpenVPN" -j ACCEPT
 	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport 5555 -j ACCEPT
 	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport 8888 -j ACCEPT
 	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport 992 -j ACCEPT
+	iptables -t mangle -I OUTPUT -p udp -m multiport --sports 500,1701,4500 -m comment --comment "SOFTETHER_VPN-SERVER-L2TP-IPSec" -j RETURN
+	iptables -t mangle -I OUTPUT -p udp --sport $openvpnport -m comment --comment "SOFTETHER_VPN-SERVER-OPENVPN" -j RETURN
+	iptables -t mangle -I OUTPUT -p tcp --sport $openvpnport -m comment --comment "SOFTETHER_VPN-SERVER-OPENVPN" -j RETURN
 }
 
 del_rule() {
-	count=$(iptables -n -L INPUT 2>/dev/null | grep -c "SOFTETHER_VPN-SERVER")
-	if [ -n "$count" ]; then
-		until [ "$count" = 0 ]
-		do
-			rules=$(iptables -n -L INPUT --line-num 2>/dev/null | grep "SOFTETHER_VPN-SERVER" | awk '{print $1}')
-			for rule in $rules
-			do
-				iptables -D INPUT $rule 2>/dev/null
-				break
-			done
-			count=$(expr $count - 1)
+	ipt_del() {
+		for i in $(seq 1 $($1 -nL $2 | grep -c "SOFTETHER_VPN-SERVER")); do
+			local index=$($1 --line-number -nL $2 | grep "SOFTETHER_VPN-SERVER" | head -1 | awk '{print $1}')
+			$1 -w -D $2 $index 2>/dev/null
 		done
-	fi
+	}
+	
+	ipt_del "iptables -t mangle" "OUTPUT"
+	ipt_del "iptables" "INPUT"
 
 	iptables -F SOFTETHER_VPN-SERVER 2>/dev/null
 	iptables -X SOFTETHER_VPN-SERVER 2>/dev/null
