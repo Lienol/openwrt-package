@@ -3,8 +3,8 @@ module("luci.controller.ipsec-server", package.seeall)
 
 function index()
     if not nixio.fs.access("/etc/config/luci-app-ipsec-server") then
-		return
-	end
+        return
+    end
 
     entry({"admin", "vpn"}, firstchild(), "VPN", 45).dependent = false
     entry({"admin", "vpn", "ipsec-server"}, alias("admin", "vpn", "ipsec-server", "settings"), _("IPSec VPN Server"), 49).dependent = false
