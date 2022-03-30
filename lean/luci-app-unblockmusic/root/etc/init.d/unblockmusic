@@ -1,5 +1,7 @@
 #!/bin/sh /etc/rc.common
 
+. /lib/functions/network.sh
+
 START=97
 STOP=10
 
@@ -67,7 +69,8 @@ AUTOUPDATE=$(uci_get_by_type unblockmusic autoupdate 0)
 APPTYPE=$(uci_get_by_type unblockmusic apptype go)
 SEARCHLIMIT=$(uci_get_by_type unblockmusic search_limit 0)
 FLAC=$(uci_get_by_type unblockmusic flac_enabled 0)
-FORCE=$(uci_get_by_type unblockmusic force_enabled 0)
+REPLACE_MUSIC_SOURCE=$(uci_get_by_type unblockmusic replace_music_source 0)
+LOCAL_VIP=$(uci_get_by_type unblockmusic local_vip 0)
 
 CLOUD=$(uci_get_by_type unblockmusic cloudserver "127.0.0.1:5200:5201")
 cloudadd=$(echo "$CLOUD" | awk -F ':' '{print $1}')
@@ -75,6 +78,9 @@ cloudhttp=$(echo "$CLOUD" | awk -F ':' '{print $2}')
 cloudhttps=$(echo "$CLOUD" | awk -F ':' '{print $3}')
 
 cloudip=$(check_host $cloudadd)
+
+network_flush_cache
+network_get_ipaddr lanaddr "lan"
 
 CRON_FILE=/etc/crontabs/root
 
@@ -100,6 +106,7 @@ add_rule()
   else
     $ipt_n -A CLOUD_MUSIC -p tcp -m set ! --match-set music_http src --dport 80 -j DNAT --to $cloudip:$cloudhttp
     $ipt_n -A CLOUD_MUSIC -p tcp -m set ! --match-set music_https src --dport 443 -j DNAT --to $cloudip:$cloudhttps
+    $ipt_n -I POSTROUTING -p tcp -m multiport --dport $cloudhttp,$cloudhttps -d $cloudip -j SNAT --to-source $lanaddr
 	fi
 	$ipt_n -I PREROUTING -p tcp -m set --match-set music dst -j CLOUD_MUSIC
 	iptables -I OUTPUT -d 223.252.199.10 -j DROP
@@ -109,6 +116,7 @@ add_rule()
 
 del_rule(){
 	$ipt_n -D PREROUTING -p tcp -m set --match-set music dst -j CLOUD_MUSIC 2>/dev/null
+        $ipt_n -D POSTROUTING -p tcp -m multiport --dport $cloudhttp,$cloudhttps -d $cloudip -j SNAT --to-source $lanaddr 2>/dev/null
 	$ipt_n -F CLOUD_MUSIC  2>/dev/null
 	$ipt_n -X CLOUD_MUSIC  2>/dev/null
 	iptables -D OUTPUT -d 223.252.199.10 -j DROP 2>/dev/null
@@ -175,26 +183,27 @@ start()
     if [ $FLAC -eq 1 ]; then
       export ENABLE_FLAC=true
     fi
-    if [ $FORCE -eq 1 ]; then
-      sed -i '/item.code != 200/ { s/item.code != 200 || item.freeTrialInfo/item.br < 320000/g; }'  /usr/share/UnblockNeteaseMusic/src/hook.js
-    else
-      sed -i '/item.br < 320000/ { s/item.br < 320000/item.code != 200 || item.freeTrialInfo/g; }'  /usr/share/UnblockNeteaseMusic/src/hook.js
+    if [ $REPLACE_MUSIC_SOURCE -ne 0 ]; then
+      export MIN_BR=$REPLACE_MUSIC_SOURCE
+    fi
+	if [ $LOCAL_VIP -eq 1 ]; then
+      export ENABLE_LOCAL_VIP=true
     fi
     node /usr/share/UnblockNeteaseMusic/app.js -p 5200 $musictype >>/tmp/unblockmusic.log 2>&1 &
     node /usr/share/UnblockNeteaseMusic/app.js -e https://music.163.com -p 5203:5201 $musictype >>/tmp/unblockmusic.log 2>&1 &
     add_cron
     echo "$(date -R) # UnblockNeteaseMusic Nodejs Version (http:5200, https:5201)" >>/tmp/unblockmusic.log  
-	elif [ "$APPTYPE" == "go" ]; then
+  elif [ "$APPTYPE" == "go" ]; then
     if [ $FLAC -eq 1 ]; then
       ENABLE_FLAC="-b "
     fi
     UnblockNeteaseMusic -o "kuwo:kugou" $ENABLE_FLAC -p 5200 -sp 5201 -c /usr/share/UnblockNeteaseMusicGo/server.crt -k /usr/share/UnblockNeteaseMusicGo/server.key -m 0 -e -sl ${SEARCHLIMIT} -l /tmp/unblockmusic.log &
     echo "$(date -R) # UnblockNeteaseMusic Golang Version (http:5200, https:5201)" >>/tmp/unblockmusic.log
-  else
+    else
     kill -9 $(busybox ps -w | grep 'sleep 60m' | grep -v grep | awk '{print $1}') >/dev/null 2>&1
     /usr/bin/UnblockNeteaseMusicCloud >/dev/null 2>&1 &
      echo "$(date -R) # UnblockNeteaseMusic Cloud Version - Server: $cloudip (http:$cloudhttp, https:$cloudhttps)" >>/tmp/unblockmusic.log
-	fi
+  fi
 		
 	set_firewall
 	
