@@ -7,12 +7,12 @@
 include $(TOPDIR)/rules.mk
 
 PKG_NAME:=qbittorrent
-PKG_VERSION:=4.3.7
+PKG_VERSION:=4.4.2
 PKG_RELEASE=1
 
 PKG_SOURCE:=qBittorrent-release-$(PKG_VERSION).tar.gz
 PKG_SOURCE_URL:=https://codeload.github.com/qbittorrent/qBittorrent/tar.gz/release-$(PKG_VERSION)?
-PKG_HASH:=d17c0bd852aaf8b75d61026ee213ad9147c37d8e3a14a3137b735732061bd1b1
+PKG_HASH:=f9406eb982a4b8a084341fb0bc30bd8b50babe5dcf4197204ab407b06e20e8a3
 
 PKG_BUILD_DIR:=$(BUILD_DIR)/qBittorrent-release-$(PKG_VERSION)
 
@@ -27,6 +27,7 @@ PKG_INSTALL:=1
 PKG_USE_MIPS16:=0
 
 include $(INCLUDE_DIR)/package.mk
+include $(INCLUDE_DIR)/cmake.mk
 
 define Package/qbittorrent
 	SECTION:=net
@@ -37,6 +38,7 @@ define Package/qbittorrent
 		+libopenssl \
 		+qt5-core \
 		+qt5-network \
+		+qt5-sql \
 		+qt5-xml \
 		+zlib
 	TITLE:=bittorrent client programmed in C++ / Qt
@@ -52,16 +54,34 @@ define Package/qbittorrent/description
   well as many features.
 endef
 
-CONFIGURE_ARGS += \
-	--disable-gui \
-	--enable-stacktrace=no \
-	--with-boost=$(STAGING_DIR)/usr
+CMAKE_OPTIONS += \
+	-DCMAKE_BUILD_TYPE=Release \
+	-DQT6=OFF \
+	-DSTACKTRACE=OFF \
+	-DWEBUI=ON \
+	-DGUI=OFF \
+	-DVERBOSE_CONFIGURE=ON
 
-MAKE_VARS += \
-	INSTALL_ROOT="$(PKG_INSTALL_DIR)"
+# The pcre2 is compiled with support for mips16
+ifdef CONFIG_USE_MIPS16
+  TARGET_CFLAGS += -minterlink-mips16
+endif
 
+# Support the glibc
+ifdef CONFIG_USE_GLIBC
+  TARGET_LDFLAGS += -ldl -lrt -lpthread
+endif
 
-TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed
+TARGET_CFLAGS += -std=c++17 -ffunction-sections -fdata-sections -flto
+TARGET_LDFLAGS += -Wl,--gc-sections,--as-needed -flto
+
+# The pentium-mmx with lto will build failed on qt6
+ifeq ($(ARCH),i386)
+  ifneq ($(findstring pentium-mmx,$(CONFIG_CPU_TYPE)),)
+    TARGET_CFLAGS := $(filter-out -flto,$(TARGET_CFLAGS))
+    TARGET_LDFLAGS := $(filter-out -flto,$(TARGET_LDFLAGS))
+  endif
+endif
 
 define Package/qbittorrent/conffiles
 /etc/config/qbittorrent
