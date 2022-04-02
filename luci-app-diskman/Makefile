@@ -49,8 +49,8 @@ define Package/$(PKG_NAME)
 	+PACKAGE_$(PKG_NAME)_INCLUDE_mdadm:mdadm \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_kmod_md_raid456:mdadm \
 	+PACKAGE_$(PKG_NAME)_INCLUDE_kmod_md_raid456:kmod-md-raid456 \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_kmod_md_linears:mdadm \
-	+PACKAGE_$(PKG_NAME)_INCLUDE_kmod_md_linears:kmod-md-linear
+	+PACKAGE_$(PKG_NAME)_INCLUDE_kmod_md_linear:mdadm \
+	+PACKAGE_$(PKG_NAME)_INCLUDE_kmod_md_linear:kmod-md-linear
 endef
 
 define Package/$(PKG_NAME)/description
