@@ -9,3 +9,6 @@ msgstr "未运行"
 
 msgid "RUNNING"
 msgstr "运行中"
+
+msgid "Blacklist"
+msgstr "黑名单"
