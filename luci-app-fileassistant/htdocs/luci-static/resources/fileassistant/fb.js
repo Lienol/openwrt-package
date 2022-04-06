@@ -91,6 +91,23 @@ String.prototype.replaceAll = function(search, replacement) {
     }
   }
 
+  function chmodPath(filename, isdir) {
+    var newmod = prompt('请输入新的权限位（支持八进制权限位或者a+x格式）：', isdir === "1" ? "0755" : "0644");
+    if (newmod) {
+      iwxhr.get('/cgi-bin/luci/admin/nas/fileassistant/chmod',
+        {
+          filepath: concatPath(currentPath, filename),
+          newmod: newmod
+        },
+        function (x, res) {
+          if (res.ec === 0) {
+            refresh_list(res.data, currentPath);
+          }
+        }
+      );
+    }
+  }
+
   function openpath(filename, dirname) {
     dirname = dirname || currentPath;
     window.open('/cgi-bin/luci/admin/nas/fileassistant/open?path='
@@ -129,6 +146,10 @@ String.prototype.replaceAll = function(search, replacement) {
     }
     else if (targetElem.className.indexOf('cbi-button-edit') > -1) {
       renamePath(targetElem.parentNode.parentNode.dataset['filename']);
+    }
+    else if (targetElem.className.indexOf('cbi-button-chmod') > -1) {
+      infoElem = targetElem.parentNode.parentNode;
+      chmodPath(infoElem.dataset['filename'] , infoElem.dataset['isdir']);
     }
     else if (targetElem = getFileElem(targetElem)) {
       if (targetElem.className.indexOf('parent-icon') > -1) {
@@ -203,7 +224,8 @@ String.prototype.replaceAll = function(search, replacement) {
             + '<td class="cbi-value-field cbi-value-perm">'+o.perms+'</td>'
             + '<td class="cbi-section-table-cell">\
 				<button class="cbi-button cbi-button-edit">重命名</button>\
-                <button class="cbi-button cbi-button-remove">删除</button>'
+                <button class="cbi-button cbi-button-remove">删除</button>\
+                <button class="cbi-button cbi-button-apply cbi-button-chmod">改权限</button>'
 			+ install_btn
 			+ '</td>'
             + '</tr>';
