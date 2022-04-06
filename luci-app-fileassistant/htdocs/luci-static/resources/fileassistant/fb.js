@@ -156,7 +156,14 @@ String.prototype.replaceAll = function(search, replacement) {
     }
   }
   function refresh_list(filenames, path) {
-    var listHtml = '<table class="cbi-section-table"><tbody>';
+    var listHtml = '<table class="cbi-section-table"><thead><tr class="cbi-section-table-row cbi-rowstyle-2">'
+      +'<td class="cbi-value-field">文件</td>'
+      +'<td class="cbi-value-field">所有者</td>'
+      +'<td class="cbi-value-field">修改时间</td>'
+      +'<td class="cbi-value-field">大小</td>'
+      +'<td class="cbi-value-field">权限</td>'
+      +'<td class="cbi-section-table-cell">操作</td>'
+      +'</tr></thead><tbody>';
     if (path !== '/') {
       listHtml += '<tr class="cbi-section-table-row cbi-rowstyle-2"><td class="parent-icon" colspan="6"><strong>..</strong></td></tr>';
     }
