@@ -32,6 +32,9 @@ function index()
 
     page = entry({"admin", "nas", "fileassistant", "chmod"}, call("fileassistant_chmod"), nil)
     page.leaf = true
+
+    page = entry({"admin", "nas", "fileassistant", "chown"}, call("fileassistant_chown"), nil)
+    page.leaf = true
 end
 
 function list_response(path, success)
@@ -149,6 +152,13 @@ function fileassistant_chmod()
     local path = luci.http.formvalue("filepath")
     local newmod = luci.http.formvalue("newmod")
     local success = os.execute('chmod '..newmod..' "'..path..'"')
+    list_response(nixio.fs.dirname(path), success)
+end
+
+function fileassistant_chown()
+    local path = luci.http.formvalue("filepath")
+    local newown = luci.http.formvalue("newown")
+    local success = os.execute('chown '..newown..' "'..path..'"')
     list_response(nixio.fs.dirname(path), success)
 end
 

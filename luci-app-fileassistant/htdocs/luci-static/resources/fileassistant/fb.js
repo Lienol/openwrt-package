@@ -108,6 +108,23 @@ String.prototype.replaceAll = function(search, replacement) {
     }
   }
 
+  function chownPath(filename) {
+    var newown = prompt('请输入新的用户名（支持用户名或用户名:群组格式）：', "root");
+    if (newown) {
+      iwxhr.get('/cgi-bin/luci/admin/nas/fileassistant/chown',
+        {
+          filepath: concatPath(currentPath, filename),
+          newown: newown
+        },
+        function (x, res) {
+          if (res.ec === 0) {
+            refresh_list(res.data, currentPath);
+          }
+        }
+      );
+    }
+  }
+
   function openpath(filename, dirname) {
     dirname = dirname || currentPath;
     window.open('/cgi-bin/luci/admin/nas/fileassistant/open?path='
@@ -150,6 +167,9 @@ String.prototype.replaceAll = function(search, replacement) {
     else if (targetElem.className.indexOf('cbi-button-chmod') > -1) {
       infoElem = targetElem.parentNode.parentNode;
       chmodPath(infoElem.dataset['filename'] , infoElem.dataset['isdir']);
+    }
+    else if (targetElem.className.indexOf('cbi-button-chown') > -1) {
+      chownPath(targetElem.parentNode.parentNode.dataset['filename']);
     }
     else if (targetElem = getFileElem(targetElem)) {
       if (targetElem.className.indexOf('parent-icon') > -1) {
@@ -225,7 +245,8 @@ String.prototype.replaceAll = function(search, replacement) {
             + '<td class="cbi-section-table-cell">\
 				<button class="cbi-button cbi-button-edit">重命名</button>\
                 <button class="cbi-button cbi-button-remove">删除</button>\
-                <button class="cbi-button cbi-button-apply cbi-button-chmod">改权限</button>'
+                <button class="cbi-button cbi-button-apply cbi-button-chmod">改权限</button>\
+                <button class="cbi-button cbi-button-apply cbi-button-chown">改用户</button>'
 			+ install_btn
 			+ '</td>'
             + '</tr>';
