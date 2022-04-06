@@ -27,6 +27,8 @@ function index()
     page = entry({"admin", "nas", "fileassistant", "install"}, call("fileassistant_install"), nil)
     page.leaf = true
 
+    page = entry({"admin", "nas", "fileassistant", "mkdir"}, call("fileassistant_mkdir"), nil)
+    page.leaf = true
 end
 
 function list_response(path, success)
@@ -131,6 +133,13 @@ function fileassistant_upload()
     )
 
     list_response(uploaddir, true)
+end
+
+function fileassistant_mkdir()
+    local path = luci.http.formvalue("path")
+    local dirname = luci.http.formvalue("dirname")
+    local success = os.execute('sh -c \'cd "'..path..'" && mkdir -p "'..dirname..'"\'')
+    list_response(path, success)
 end
 
 function scandir(directory)
