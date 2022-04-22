@@ -84,7 +84,7 @@ start(){
 	iptables_w -t filter -N WEBURL_REJECT
 	iptables_w -t filter -F WEBURL_REJECT
 	iptables_w -t filter -I WEBURL_REJECT -j DROP
-	# iptables_w -t filter -I WEBURL_REJECT -p tcp -j REJECT --reject-with tcp-reset
+	iptables_w -t filter -I WEBURL_REJECT -p tcp -j REJECT --reject-with tcp-reset
 	iptables_w -t filter -N WEBURL_RULES
 	iptables_w -t filter -F WEBURL_RULES
 	config_foreach add_rule macbind
