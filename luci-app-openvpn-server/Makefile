@@ -12,10 +12,10 @@ LUCI_PKGARCH:=all
 
 define Package/$(PKG_NAME)/conffiles
 /etc/config/luci-app-openvpn
-/usr/share/openvpn/ca.crt
-/usr/share/openvpn/dh.pem
-/usr/share/openvpn/server.crt
-/usr/share/openvpn/server.key
+/usr/share/openvpn-server/ca.crt
+/usr/share/openvpn-server/dh.pem
+/usr/share/openvpn-server/server.crt
+/usr/share/openvpn-server/server.key
 endef
 
 include $(TOPDIR)/feeds/luci/luci.mk
