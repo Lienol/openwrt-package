@@ -34,6 +34,9 @@ msgstr "监听协议"
 msgid "Listen port"
 msgstr "监听端口"
 
+msgid "REUSEADDR"
+msgstr "地址重用"
+
 msgid "Bind to a port local"
 msgstr "绑定到本地端口"
 
