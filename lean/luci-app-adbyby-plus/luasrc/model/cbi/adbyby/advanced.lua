@@ -52,6 +52,16 @@ o.write = function()
 end
 
 o = s:option(DynamicList, "subscribe_url", translate("Anti-AD Rules Subscribe"))
+o:value("https://cdn.jsdelivr.net/gh/cjx82630/cjxlist/cjx-annoyance.txt", translate("cjx-annoyance"))
+o:value("https://easylist-downloads.adblockplus.org/easylistchina.txt", translate("easylistchina"))
+o:value("https://easylist-downloads.adblockplus.org/easyprivacy.txt", translate("easyprivacy"))
+o:value("https://easylist-downloads.adblockplus.org/easylist.txt", translate("easylist"))
+o:value("https://raw.githubusercontent.com/Spam404/lists/master/adblock-list.txt", translate("adblock-list"))
+o:value("https://raw.githubusercontent.com/bongochong/CombinedPrivacyBlockLists/master/cpbl-abp-list.txt", translate("cpbl-abp-list"))
+o:value("https://anti-ad.net/easylist.txt", translate("anti-ad"))
+o:value("https://anti-ad.net/anti-ad-for-dnsmasq.conf", translate("anti-ad-for-dnsmasq"))
+o:value("https://raw.githubusercontent.com/hoshsadiq/adblock-nocoin-list/master/nocoin.txt", translate("nocoin"))
+o:value("https://easylist-downloads.adblockplus.org/abp-filters-anti-cv.txt", translate("abp-filters-anti-cv"))
 o.rmempty = true
 
 return m
