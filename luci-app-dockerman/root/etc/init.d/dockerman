@@ -78,7 +78,7 @@ delete_dockerman_chain(){
 }
 
 add_allowed_interface(){
-	iptables_append DOCKER-MAN -i $1 -o docker0 -j RETURN
+	iptables_append DOCKER-MAN -i $1 -o docker0 -j ACCEPT
 }
 
 add_allowed_ports(){
