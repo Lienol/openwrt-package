@@ -94,6 +94,12 @@ msgstr "BBR 拥塞控制算法"
 msgid "FullCone NAT"
 msgstr "全锥型 NAT"
 
+msgid "Compatible Mode"
+msgstr "兼容模式"
+
+msgid "High Performing Mode"
+msgstr "高性能模式"
+
 msgid "DNS Caching"
 msgstr "DNS 缓存"
 
