@@ -36,8 +36,8 @@ define Package/$(PKG_NAME)/install
 	$(INSTALL_DIR) $(1)/lib
 	$(INSTALL_DIR) $(1)/lib/firmware
 	$(INSTALL_DIR) $(1)/lib/firmware/brcm
-	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_69027 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
-#	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_ac88.48260 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
+#	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_69027 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
+	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_ac88.48260 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
 #	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_ac88_1 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
 #	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_ac88_2 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
 #	$(INSTALL_DATA) ./files/lib/firmware/brcm/brcmfmac4366c-pcie.bin_ac88_3 $(1)/lib/firmware/brcm/brcmfmac4366c-pcie.bin
