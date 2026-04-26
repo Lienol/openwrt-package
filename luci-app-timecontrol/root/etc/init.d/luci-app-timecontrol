@@ -2,6 +2,8 @@
 
 START=99
 
+CONFIG="luci-app-timecontrol"
+
 TIMECONTROL_ENABLE=0
 
 iptables_w(){
@@ -48,7 +50,7 @@ timecontrol_header(){
 
 start(){
 	local table
-	config_load timecontrol
+	config_load ${CONFIG}
 	config_foreach timecontrol_header basic
 
 	[ "$TIMECONTROL_ENABLE" != "1" ] && return 0
@@ -78,7 +80,7 @@ start(){
 	iptables_w -t filter -I FORWARD -j TIMECONTROL
 	iptables_w -t nat -I TIMECONTROL -i $interface -j TIMECONTROL_RULES
 	iptables_w -t nat -I PREROUTING -j TIMECONTROL
-	echo "/etc/init.d/timecontrol restart" > "/var/etc/timecontrol.include"
+	echo "/etc/init.d/${CONFIG} restart" > "/var/etc/${CONFIG}.include"
 }
 
 stop(){
