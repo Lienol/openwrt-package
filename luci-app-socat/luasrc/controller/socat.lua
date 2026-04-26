@@ -2,7 +2,7 @@
 module("luci.controller.socat", package.seeall)
 
 function index()
-	if not nixio.fs.access("/etc/config/socat") then
+	if not nixio.fs.access("/etc/config/luci-app-socat") then
 		return
 	end
 
@@ -15,7 +15,7 @@ end
 function act_status()
 	local e = {}
 	e.index = luci.http.formvalue("index")
-	e.status = luci.sys.call(string.format("busybox ps -w | grep -v 'grep' | grep '/var/etc/socat/%s' >/dev/null", luci.http.formvalue("id"))) == 0
+	e.status = luci.sys.call(string.format("busybox ps -w | grep -v 'grep' | grep '/var/etc/luci-app-socat/%s' >/dev/null", luci.http.formvalue("id"))) == 0
 	luci.http.prepare_content("application/json")
 	luci.http.write_json(e)
 end
