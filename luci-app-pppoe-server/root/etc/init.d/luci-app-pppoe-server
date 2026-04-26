@@ -3,7 +3,7 @@
 
 START=99
 
-CONFIG="pppoe-server"
+CONFIG="luci-app-pppoe-server"
 CONFIG_PATH=/var/etc/${CONFIG}
 OPTIONS_FILE=${CONFIG_PATH}/options
 CHAP_SECRETS=/etc/ppp/chap-secrets
@@ -80,8 +80,8 @@ start() {
 		${ms_dns1}
 		${ms_dns2}
 		logfile ${CONFIG_PATH}/log.log
-		ip-up-script /usr/share/pppoe-server/ip-up
-		ip-down-script /usr/share/pppoe-server/ip-down
+		ip-up-script /usr/share/${CONFIG}/ip-up
+		ip-down-script /usr/share/${CONFIG}/ip-down
 	EOF
 	
 	local _users=$(uci show ${CONFIG} | grep "=user" | cut -d '.' -sf 2 | cut -d '=' -sf 1)

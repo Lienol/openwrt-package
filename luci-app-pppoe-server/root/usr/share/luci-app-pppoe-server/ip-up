@@ -1,7 +1,7 @@
 #!/bin/sh
 
 _LOGIN_TIME="$(date "+%Y-%m-%d %H:%M:%S")"
-CONFIG="pppoe-server"
+CONFIG="luci-app-pppoe-server"
 CONFIG_PATH=/var/etc/${CONFIG}
 SESSION_PATH=${CONFIG_PATH}/session
 
