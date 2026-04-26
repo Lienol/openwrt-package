@@ -3,7 +3,7 @@
 
 START=99
 
-CONFIG="pppoe-relay"
+CONFIG="luci-app-pppoe-relay"
 
 BIN="$(command -v pppoe-relay)"
 
