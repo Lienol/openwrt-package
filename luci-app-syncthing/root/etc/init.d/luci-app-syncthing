@@ -27,7 +27,7 @@ run_syncthing()
 
 start()
 {
-	config_load syncthing
+	config_load "luci-app-syncthing"
 	config_foreach run_syncthing setting
 }
 
