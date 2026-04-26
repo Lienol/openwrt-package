@@ -4,7 +4,7 @@
 
 START=99
 
-CONFIG=socat
+CONFIG="luci-app-socat"
 CONFIG_PATH=/var/etc/$CONFIG
 NFTABLES=false
 
