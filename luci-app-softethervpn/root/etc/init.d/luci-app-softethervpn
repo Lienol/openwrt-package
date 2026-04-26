@@ -6,24 +6,25 @@ STOP=10
 
 USE_PROCD=1
 
-CONFIG=softethervpn
+CONFIG="luci-app-softethervpn"
+IPT="iptables -w"
 
 add_rule() {
 	openvpnport=$(cat /usr/libexec/softethervpn/vpn_server.config 2>/dev/null | grep OpenVPN_UdpPortList | awk -F " " '{print $3}')
 	[ -z "$openvpnport" ] && openvpnport=1194
 
-	iptables -N SOFTETHER_VPN-SERVER
-	iptables -I INPUT -j SOFTETHER_VPN-SERVER
+	${IPT} -N SOFTETHER_VPN-SERVER
+	${IPT} -I INPUT -j SOFTETHER_VPN-SERVER
 	
-	iptables -A SOFTETHER_VPN-SERVER -p udp -m multiport --dports 500,1701,4500 -m comment --comment "L2TP-IPSec" -j ACCEPT
-	iptables -A SOFTETHER_VPN-SERVER -p udp --dport $openvpnport -m comment --comment "OpenVPN" -j ACCEPT
-	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport $openvpnport -m comment --comment "OpenVPN" -j ACCEPT
-	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport 5555 -j ACCEPT
-	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport 8888 -j ACCEPT
-	iptables -A SOFTETHER_VPN-SERVER -p tcp --dport 992 -j ACCEPT
-	iptables -t mangle -I OUTPUT -p udp -m multiport --sports 500,1701,4500 -m comment --comment "SOFTETHER_VPN-SERVER-L2TP-IPSec" -j RETURN
-	iptables -t mangle -I OUTPUT -p udp --sport $openvpnport -m comment --comment "SOFTETHER_VPN-SERVER-OPENVPN" -j RETURN
-	iptables -t mangle -I OUTPUT -p tcp --sport $openvpnport -m comment --comment "SOFTETHER_VPN-SERVER-OPENVPN" -j RETURN
+	${IPT} -A SOFTETHER_VPN-SERVER -p udp -m multiport --dports 500,1701,4500 -m comment --comment "L2TP-IPSec" -j ACCEPT
+	${IPT} -A SOFTETHER_VPN-SERVER -p udp --dport $openvpnport -m comment --comment "OpenVPN" -j ACCEPT
+	${IPT} -A SOFTETHER_VPN-SERVER -p tcp --dport $openvpnport -m comment --comment "OpenVPN" -j ACCEPT
+	${IPT} -A SOFTETHER_VPN-SERVER -p tcp --dport 5555 -j ACCEPT
+	${IPT} -A SOFTETHER_VPN-SERVER -p tcp --dport 8888 -j ACCEPT
+	${IPT} -A SOFTETHER_VPN-SERVER -p tcp --dport 992 -j ACCEPT
+	${IPT} -t mangle -I OUTPUT -p udp -m multiport --sports 500,1701,4500 -m comment --comment "SOFTETHER_VPN-SERVER-L2TP-IPSec" -j RETURN
+	${IPT} -t mangle -I OUTPUT -p udp --sport $openvpnport -m comment --comment "SOFTETHER_VPN-SERVER-OPENVPN" -j RETURN
+	${IPT} -t mangle -I OUTPUT -p tcp --sport $openvpnport -m comment --comment "SOFTETHER_VPN-SERVER-OPENVPN" -j RETURN
 }
 
 del_rule() {
@@ -34,11 +35,11 @@ del_rule() {
 		done
 	}
 	
-	ipt_del "iptables -t mangle" "OUTPUT"
-	ipt_del "iptables" "INPUT"
+	ipt_del "${IPT} -t mangle" "OUTPUT"
+	ipt_del "${IPT}" "INPUT"
 
-	iptables -F SOFTETHER_VPN-SERVER 2>/dev/null
-	iptables -X SOFTETHER_VPN-SERVER 2>/dev/null
+	${IPT} -F SOFTETHER_VPN-SERVER 2>/dev/null
+	${IPT} -X SOFTETHER_VPN-SERVER 2>/dev/null
 }
 
 gen_include() {
@@ -73,7 +74,8 @@ start_service() {
 }
 
 stop_service() {
-	top -bn1 | grep "/usr/libexec/softethervpn" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1
+	#top -bn1 | grep "/usr/libexec/softethervpn" | grep -v "grep" | awk '{print $1}' | xargs kill -9 >/dev/null 2>&1
+	/usr/libexec/softethervpn/vpnserver stop
 	del_rule
 	rm -rf /var/etc/$CONFIG.include
 }
