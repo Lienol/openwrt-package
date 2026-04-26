@@ -11,7 +11,7 @@ LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-app-adbyby-plus
 PKG_VERSION:=2.0
-PKG_RELEASE:=76
+PKG_RELEASE:=77
 
 include $(TOPDIR)/feeds/luci/luci.mk
 
