@@ -29,9 +29,10 @@ o.cfgvalue = function(self, section)
     local html = ""
 
     for i, o in ipairs(obj) do
-        html = html .. string.format("<a href='%s'>%s &nbsp&nbsp", o.url, o.title)
+        html = html .. string.format("<a href='%s'>%s &nbsp&nbsp</a>", o.url, o.title)
     end
 
     return html
 end
+
 return m
