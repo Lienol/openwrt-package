@@ -1,19 +1,26 @@
 #!/bin/sh
 
 uci -q batch <<-EOF >/dev/null
-	delete firewall.luci_app_ipsec_server
-	set firewall.luci_app_ipsec_server=include
-	set firewall.luci_app_ipsec_server.type=script
-	set firewall.luci_app_ipsec_server.path=/var/etc/ipsecvpn.include
-	set firewall.luci_app_ipsec_server.reload=1
-EOF
-
-uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@luci-app-ipsec-server[-1]
 	add ucitrack luci-app-ipsec-server
 	set ucitrack.@luci-app-ipsec-server[-1].init=luci-app-ipsec-server
 	commit ucitrack
 EOF
+
+uci -q batch <<-EOF >/dev/null
+	delete firewall.luci_app_ipsec_server
+	set firewall.luci_app_ipsec_server=include
+	set firewall.luci_app_ipsec_server.type=script
+	set firewall.luci_app_ipsec_server.path=/var/etc/ipsecvpn.include
+EOF
+
+if [ -x "/sbin/fw3" ] && [ ! -L "/sbin/fw3" ]; then
+	uci -q set firewall.luci_app_ipsec_server.reload='1'
+else
+	uci -q delete firewall.luci_app_ipsec_server.reload
+	uci -q delete firewall.luci_app_ipsec_server.fw4_compatible
+fi
+uci commit firewall
 
 /etc/init.d/ipsec disable 2>/dev/null
 /etc/init.d/ipsec stop 2>/dev/null

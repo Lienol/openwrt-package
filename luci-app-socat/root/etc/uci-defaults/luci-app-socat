@@ -1,13 +1,26 @@
 #!/bin/sh
 
 uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@luci-app-socat[-1]
+	add ucitrack luci-app-socat
+	set ucitrack.@luci-app-socat[-1].init=luci-app-socat
+	commit ucitrack
+EOF
+
+uci -q batch <<-EOF >/dev/null
 	delete firewall.luci_app_socat
 	set firewall.luci_app_socat=include
 	set firewall.luci_app_socat.type=script
 	set firewall.luci_app_socat.path=/var/etc/luci-app-socat.include
-	set firewall.luci_app_socat.reload=1
-	commit firewall
 EOF
+
+if [ -x "/sbin/fw3" ] && [ ! -L "/sbin/fw3" ]; then
+	uci -q set firewall.luci_app_socat.reload='1'
+else
+	uci -q delete firewall.luci_app_socat.reload
+	uci -q delete firewall.luci_app_socat.fw4_compatible
+fi
+uci commit firewall
 
 if [ -x /sbin/fw4 ]; then
 	if ! nft -at list chain inet fw4 socat_input >/dev/null 2>&1 ; then
@@ -16,12 +29,6 @@ if [ -x /sbin/fw4 ]; then
 		fw4 -q reload
 	fi
 fi
-uci -q batch <<-EOF >/dev/null
-	delete ucitrack.@luci-app-socat[-1]
-	add ucitrack luci-app-socat
-	set ucitrack.@luci-app-socat[-1].init=luci-app-socat
-	commit ucitrack
-EOF
 
 rm -rf /tmp/luci-*cache
 exit 0

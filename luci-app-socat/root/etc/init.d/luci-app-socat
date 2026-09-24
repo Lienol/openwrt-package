@@ -63,6 +63,7 @@ gen_include() {
 		ip6tables-restore -n <<-EOT
 		$(extract_rules 6 filter)
 		EOT
+		exit 0
 	EOF
 	return 0
 }

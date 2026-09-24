@@ -1,19 +1,26 @@
 #!/bin/sh
 
 uci -q batch <<-EOF >/dev/null
-	delete firewall.luci_app_pppoe_server
-	set firewall.luci_app_pppoe_server=include
-	set firewall.luci_app_pppoe_server.type=script
-	set firewall.luci_app_pppoe_server.path=/var/etc/luci-app-pppoe-server.include
-	set firewall.luci_app_pppoe_server.reload=1
-EOF
-
-uci -q batch <<-EOF >/dev/null
 	delete ucitrack.@luci-app-pppoe-server[-1]
 	add ucitrack luci-app-pppoe-server
 	set ucitrack.@luci-app-pppoe-server[-1].init=luci-app-pppoe-server
 	commit ucitrack
 EOF
+
+uci -q batch <<-EOF >/dev/null
+	delete firewall.luci_app_pppoe_server
+	set firewall.luci_app_pppoe_server=include
+	set firewall.luci_app_pppoe_server.type=script
+	set firewall.luci_app_pppoe_server.path=/var/etc/luci-app-pppoe-server.include
+EOF
+
+if [ -x "/sbin/fw3" ] && [ ! -L "/sbin/fw3" ]; then
+	uci -q set firewall.luci_app_pppoe_server.reload='1'
+else
+	uci -q delete firewall.luci_app_pppoe_server.reload
+	uci -q delete firewall.luci_app_pppoe_server.fw4_compatible
+fi
+uci commit firewall
 
 rm -rf /tmp/luci-*cache
 exit 0

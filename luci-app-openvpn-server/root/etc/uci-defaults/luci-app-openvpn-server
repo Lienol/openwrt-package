@@ -1,5 +1,12 @@
 #!/bin/sh
 
+uci -q batch <<-EOF >/dev/null
+	delete ucitrack.@luci-app-openvpn-server[-1]
+	add ucitrack luci-app-openvpn-server
+	set ucitrack.@luci-app-openvpn-server[-1].init=luci-app-openvpn-server
+	commit ucitrack
+EOF
+
 count=$(uci -q show firewall | grep "@forwarding" | grep "ovpn_server" | awk -F '.' '{print $2}' | awk -F '=' '{print $1}' | wc -l)
 for i in $(seq 1 $count); do
 	id=$(uci -q show firewall | grep "@forwarding" | grep "ovpn_server" | awk -F '.' '{print $2}' | awk -F '=' '{print $1}' | head -n 1)
@@ -8,12 +15,6 @@ done
 uci -q commit firewall
 
 uci -q batch <<-EOF >/dev/null
-	delete firewall.openvpn_server
-	set firewall.openvpn_server=include
-	set firewall.openvpn_server.type=script
-	set firewall.openvpn_server.path=/var/etc/luci-app-openvpn-server.include
-	set firewall.openvpn_server.reload=1
-	
 	delete firewall.ovpn_server
 	set firewall.ovpn_server=zone
 	set firewall.ovpn_server.name='ovpn_server'
@@ -26,13 +27,20 @@ uci -q batch <<-EOF >/dev/null
 	set firewall.lantoovpnserver=forwarding
 	set firewall.lantoovpnserver.src='lan'
 	set firewall.lantoovpnserver.dest='ovpn_server'
-	commit firewall
-	
-	delete ucitrack.@luci-app-openvpn-server[-1]
-	add ucitrack luci-app-openvpn-server
-	set ucitrack.@luci-app-openvpn-server[-1].init=luci-app-openvpn-server
-	commit ucitrack
+
+	delete firewall.openvpn_server
+	set firewall.openvpn_server=include
+	set firewall.openvpn_server.type=script
+	set firewall.openvpn_server.path=/var/etc/luci-app-openvpn-server.include
 EOF
+
+if [ -x "/sbin/fw3" ] && [ ! -L "/sbin/fw3" ]; then
+	uci -q set firewall.openvpn_server.reload='1'
+else
+	uci -q delete firewall.openvpn_server.reload
+	uci -q delete firewall.openvpn_server.fw4_compatible
+fi
+uci commit firewall
 
 rm -rf /tmp/luci-*cache
 exit 0
