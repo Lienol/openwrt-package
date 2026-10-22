@@ -18,11 +18,11 @@ start(){
 		/etc/mwan3helper/genipset.sh ct '/etc/mwan3helper/chinatelecom.txt'
 		/etc/mwan3helper/genipset.sh cnc '/etc/mwan3helper/unicom_cnc.txt'
 		/etc/mwan3helper/genipset.sh cmcc '/etc/mwan3helper/cmcc.txt'
-		/etc/mwan3helper/genipset.sh crtc '/etc/mwan3helper/crtc.txt'
+		/etc/mwan3helper/genipset.sh cbtn '/etc/mwan3helper/chinabtn.txt'
 		/etc/mwan3helper/genipset.sh cernet '/etc/mwan3helper/cernet.txt'
 		/etc/mwan3helper/genipset.sh gwbn '/etc/mwan3helper/gwbn.txt'
 		/etc/mwan3helper/genipset.sh othernet '/etc/mwan3helper/othernet.txt'
 	else
-		destroy_ipset cn ct cnc cmcc crtc cernet gwbn othernet
+		destroy_ipset cn ct cnc cmcc cbtn cernet gwbn othernet
 	fi
 }
