@@ -6,7 +6,7 @@
 include $(TOPDIR)/rules.mk
 
 LUCI_TITLE:=LuCI support for MWAN3 Helper
-LUCI_DEPENDS:=+luci-app-mwan3 +pdnsd-alt +dnsmasq-full +ipset
+LUCI_DEPENDS:=+luci-app-mwan3 +dnsmasq-full +ipset
 LUCI_PKGARCH:=all
 
 PKG_NAME:=luci-app-mwan3helper
