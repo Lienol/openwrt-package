@@ -33,19 +33,19 @@ local data = {
         num = get_num("ct")
     },
     cnc = {
-        name = translate("中国联通/网通"),
+        name = translate("中国联通"),
         ipset_name = "cnc",
         num = get_num("cnc")
     },
     cmcc = {
-        name = translate("中国移动"),
+        name = translate("中国移动/铁通"),
         ipset_name = "cmcc",
         num = get_num("cmcc")
     },
-    crtc = {
-        name = translate("中国铁通"),
-        ipset_name = "crtc",
-        num = get_num("crtc")
+    cbtn = {
+        name = translate("中国广电"),
+        ipset_name = "cbtn",
+        num = get_num("cbtn")
     },
     cernet = {
         name = translate("中国教育网"),
@@ -64,7 +64,7 @@ local data = {
     },
 }
 
-local data_order = {"all_cn", "ct", "cnc", "cmcc", "crtc", "cernet", "gwbn", "othernet"}
+local data_order = {"all_cn", "ct", "cnc", "cmcc", "cbtn", "cernet", "gwbn", "othernet"}
 
 for i, v in ipairs(data_order) do
     local d = data[v]
